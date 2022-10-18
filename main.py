@@ -5,10 +5,7 @@ import os, sys
 import cv2
 import numpy as np
 import math
-
-
-
-face_cascade = cv2.CascadeClassifier('/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/haarcascade_frontalface_default.xml')
+from tracker import Tracker
 
 
 # Helper
@@ -23,7 +20,7 @@ def face_confidence(face_distance, face_match_threshold=0.6):
         return str(round(value, 2)) + '%'
 
 
-class FaceRecognition:
+class FaceRecognition():
     face_locations = []
     face_encodings = []
     face_names = []
@@ -43,7 +40,8 @@ class FaceRecognition:
             self.known_face_names.append(image)
         #print(self.known_face_names)
         #print(self.known_face_encodings)
-
+        
+        
     def run_recognition(self): 
         video_capture = cv2.VideoCapture(0)
 
@@ -80,8 +78,10 @@ class FaceRecognition:
                     if matches[best_match_index]:
                         name = self.known_face_names[best_match_index]
                         confidence = face_confidence(face_distances[best_match_index])
+                        tracker = Tracker(name, id=1, image=frame)
 
                     self.face_names.append(f'{name} ({confidence})')
+                    
 
             self.process_current_frame = not self.process_current_frame
 
