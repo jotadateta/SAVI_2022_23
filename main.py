@@ -55,29 +55,8 @@ class FaceRecognition:
 
             # Only process every other frame of video to save time
             if self.process_current_frame:
-                # Resize frame of video to 1/2 size for faster face recognition processing
-                small_frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
-
                 # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
-                rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
-                # Convert the image from BGR color To Grayscale
-                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                
-                # Detect the faces
-                faces = face_cascade.detectMultiScale(gray, 1.1, 7)
-
-                # Draw the rectangle around each face
-                for (x, y, w, h) in faces:
-                    cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-                    # a mask is the same size as our image, but has only two pixel
-                    # values, 0 and 255 -- pixels with a value of 0 (background) are
-                    # ignored in the original image while mask pixels with a value of
-                    # 255 (foreground) are allowed to be kept
-                    #mask = np.zeros(frame.shape[:2], dtype="uint8")
-                    #cv2.rectangle(mask, (x, y), (x+w, y+h), 255, -1)
-                    #masked = cv2.bitwise_and(frame, frame, mask=mask)
-                    #big_mask = cv2.resize(masked, (0, 0), fx=2, fy=2)
-                
+                rgb_small_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 
                 # Find all the faces and face encodings in the current frame of video
                 self.face_locations = face_recognition.face_locations(rgb_small_frame)
@@ -108,15 +87,9 @@ class FaceRecognition:
 
             # Display the results
             for (top, right, bottom, left), name in zip(self.face_locations, self.face_names):
-                # Scale back up face locations since the frame we detected in was scaled to 1/ size
-                top *= 2
-                right *= 2
-                bottom *= 2
-                left *= 2
-
                 # Create the frame with the name
-                cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
-                cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+                cv2.rectangle(frame, (left-10, top-55), (right+10, bottom+15), (0, 0, 255), 2)
+                #cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
                 cv2.putText(frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1)
 
             # Display the resulting image
