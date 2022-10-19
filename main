@@ -7,14 +7,14 @@ import math
 
 def drawbox(img,bbox):
     x,y,w,h = int(bbox[0]),int(bbox[1]),int(bbox[2]),int(bbox[3])
-    cv2.rectangle(img, (x, y), (x+w, y+h), (255, 0, 0), 2)
-    cv2.putText(img, "tracking", (75,50),cv2.FONT_HERSHEY_COMPLEX,0.7,(0,0,255),1)
+    cv2.rectangle(img, (x, y), (x+w, y+h), (255, 255, 0), 2)
+    cv2.putText(img, "tracking", (75,50),cv2.FONT_HERSHEY_COMPLEX,0.7,(0,255,255),1)
 
 def detection_faces():
     count = 0
     detection_counter = 0 
     previous_detections = []
-
+    tracker = cv2.TrackerCSRT_create()
     ####################FACE DETECTION#############################
     # Load the cascade
     face_cascade = cv2.CascadeClassifier('/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/dataset/haarcascade_frontalface_default.xml')
@@ -25,10 +25,10 @@ def detection_faces():
     # cap = cv2.VideoCapture('filename.mp4')
 
     
-    tracker = cv2.TrackerCSRT_create()
-    _, img = cap.read()
-    bbox = cv2.selectROI("tracking",img,False)
-    tracker.init(img,bbox)
+    #tracker = cv2.TrackerCSRT_create()
+    #_, img = cap.read()
+    #bbox = cv2.selectROI("tracking",img,False)
+    #tracker.init(img,bbox)
     #print(bbox)
     
     while True:
@@ -38,12 +38,8 @@ def detection_faces():
         count = count + 1
         detections = []
         
-        sucess, bbox = tracker.update(img)
-        if sucess:
-            drawbox(img,bbox)
-        else:
-            cv2.putText(img, "Lost", (75,50),cv2.FONT_HERSHEY_COMPLEX,0.7,(0,0,255),1)
-
+        
+        
         # Convert to grayscale
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -65,12 +61,24 @@ def detection_faces():
         for point_1 in detections:
             for point_2 in previous_detections:
                 distance = abs(point_1[0] - point_2[0])
-
+                
                 if distance > 10:
                     print("nova pessoa")
+                    tracker.init(img,bbox)
+                else:
+                    if tracker != None:
+                        print("update no tracker")
+                        sucess, bbox = tracker.update(img)
+            
+                        if sucess:
+                            drawbox(img,bbox)
+                        else:
+                            cv2.putText(img, "Lost", (75,50),cv2.FONT_HERSHEY_COMPLEX,0.7,(0,0,255),1)
+                    else:
+                        print("não deu em nada")
+                    
             
         #print("fps "+ str(count) + " prev " + str(previous_detections) + " curr "+ str(detections))
-        
         
         
         
@@ -82,7 +90,7 @@ def detection_faces():
         
         
         # Stop if "Q" key is pressed
-        if cv2.waitKey(0) == ord('q'):
+        if cv2.waitKey(1) == ord('q'):
             break
 #########################################################################
     
