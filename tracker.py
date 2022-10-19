@@ -38,6 +38,22 @@ class BoundingBox:
         return image_full[self.y1:self.y1+self.h, self.x1:self.x1+self.w]
 
 
+class Detection(BoundingBox):
+
+    def __init__(self, x1, y1, w, h, image_full, id, stamp):
+        super().__init__(x1,y1,w,h) # call the super class constructor        
+        self.id = id
+        self.stamp = stamp
+        self.image =self.extractSmallImage(image_full)
+        self.assigned_to_tracker = False
+
+    def draw(self, image_gui, color=(255,0,0)):
+        cv2.rectangle(image_gui,(self.x1,self.y1),(self.x2, self.y2),color,3)
+
+        image = cv2.putText(image_gui, 'D' + str(self.id), (self.x1, self.y1-5), cv2.FONT_HERSHEY_SIMPLEX, 
+                        1, color, 2, cv2.LINE_AA)
+
+
 class Tracker():
 
     def __init__(self, detection, id, image):

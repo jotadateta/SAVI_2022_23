@@ -8,6 +8,8 @@ import math
 from tracker import Tracker
 
 
+
+
 # Helper
 def face_confidence(face_distance, face_match_threshold=0.6):
     range = (1.0 - face_match_threshold)
@@ -27,6 +29,9 @@ class FaceRecognition():
     known_face_encodings = []
     known_face_names = []
     process_current_frame = True
+    tracker_counter = 0
+    trackers = []
+    detections = []
 
     def __init__(self):
         self.encode_faces()
@@ -78,7 +83,8 @@ class FaceRecognition():
                     if matches[best_match_index]:
                         name = self.known_face_names[best_match_index]
                         confidence = face_confidence(face_distances[best_match_index])
-                        tracker = Tracker(name, id=1, image=frame)
+                        
+     
 
                     self.face_names.append(f'{name} ({confidence})')
                     
