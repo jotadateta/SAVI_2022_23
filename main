@@ -5,6 +5,8 @@ import cv2
 import numpy as np
 import math
 
+
+
 def drawbox(img,bbox):
     x,y,w,h = int(bbox[0]),int(bbox[1]),int(bbox[2]),int(bbox[3])
     cv2.rectangle(img, (x, y), (x+w, y+h), (255, 255, 0), 2)
@@ -15,6 +17,7 @@ def detection_faces():
     detection_counter = 0 
     previous_detections = []
     tracker = cv2.TrackerCSRT_create()
+    distance = 0
     ####################FACE DETECTION#############################
     # Load the cascade
     face_cascade = cv2.CascadeClassifier('/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/dataset/haarcascade_frontalface_default.xml')
@@ -50,6 +53,7 @@ def detection_faces():
         detections=[]
         for bbox in faces:  
             x1,y1,w,h = bbox
+            tracker.init(img,bbox)
             cv2.rectangle(img, (x1, y1), (x1+w, y1+h), (255, 0, 0), 2)
             detection_counter = detection_counter + 1
             detections.append(bbox)
@@ -57,10 +61,12 @@ def detection_faces():
             
             mask = np.zeros(img.shape[:2], dtype="uint8")
             cv2.rectangle(mask, (x1, y1), (x1+w, y1+h), 255, -1)
-        
+            
         for point_1 in detections:
             for point_2 in previous_detections:
                 distance = abs(point_1[0] - point_2[0])
+                #print("atual" + str(point_1))
+                #print("antigo" + str(point_2))
                 
                 if distance > 10:
                     print("nova pessoa")
@@ -71,6 +77,7 @@ def detection_faces():
                         sucess, bbox = tracker.update(img)
             
                         if sucess:
+                            #bbox.append(point_1)
                             drawbox(img,bbox)
                         else:
                             cv2.putText(img, "Lost", (75,50),cv2.FONT_HERSHEY_COMPLEX,0.7,(0,0,255),1)
