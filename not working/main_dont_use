@@ -62,28 +62,6 @@ def detection_faces():
             mask = np.zeros(img.shape[:2], dtype="uint8")
             cv2.rectangle(mask, (x1, y1), (x1+w, y1+h), 255, -1)
             
-        for point_1 in detections:
-            for point_2 in previous_detections:
-                distance = abs(point_1[0] - point_2[0])
-                #print("atual" + str(point_1))
-                #print("antigo" + str(point_2))
-                
-                if distance > 10:
-                    print("nova pessoa")
-                    tracker.init(img,bbox)
-                else:
-                    if tracker != None:
-                        print("update no tracker")
-                        sucess, bbox = tracker.update(img)
-            
-                        if sucess:
-                            #bbox.append(point_1)
-                            drawbox(img,bbox)
-                        else:
-                            cv2.putText(img, "Lost", (75,50),cv2.FONT_HERSHEY_COMPLEX,0.7,(0,0,255),1)
-                    else:
-                        print("não deu em nada")
-                    
             
         #print("fps "+ str(count) + " prev " + str(previous_detections) + " curr "+ str(detections))
         
