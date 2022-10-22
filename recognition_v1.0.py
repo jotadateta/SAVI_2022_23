@@ -4,6 +4,8 @@ import cv2
 import numpy as np
 import math
 from tracking import Tracker
+import copy
+import time
 
 #tracker = cv2.TrackerCSRT_create()
 #tracker_type = cv2.TrackerCSRT_create()
@@ -37,7 +39,7 @@ def drawBox(img, bbox, tracker_id):
         
         cv2.rectangle(img,(int(x),int(y)),((int(x)+int(w)),(int(y)+int(h))),(255,140,0),3)
         #cv2.putText(img, str(tracker_id), (int(x) + 6, int(y) - 6), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1)
-            
+        
 
 
 class FaceRecognition:
@@ -49,9 +51,10 @@ class FaceRecognition:
     process_current_frame = True
     detections = []
     tracker_id = 0
-    counted_id = 0
+    counted_frames = 0
     trackers = []
     bbox_prev = []
+    size_last_frame = 0
     
     
     def __init__(self):
@@ -76,8 +79,10 @@ class FaceRecognition:
             sys.exit('Video source not found...')
 
         while True:
+            
             ret, frame = video_capture.read()
             self.detections = []
+            size_curr = 0
 
             # Only process every other frame of video to save time
             if self.process_current_frame:
@@ -131,22 +136,25 @@ class FaceRecognition:
                 # ----------------------------
                 self.detections.append(bbox)
                 #print(self.detections)      
-                size = int(len(self.detections)) #number of persons
-                #print("counted id = " + str(self.counted_id))
+                size_curr = int(len(self.detections)) #number of persons
+                print("numero de pessoas current" + str(size_curr))
+                print("numero de pessoas antigo" + str(self.size_last_frame))
+                #print("counted id = " + str(self.counted_frames))
                 #print(bbox)
                 
-                if bbox != None:
-                    #print(bbox)
-                    # --------------------------------------------
-                    #Initalize the tracker for each person founded
-                    # --------------------------------------------
-                    #trackers.init (frame,bbox) 
-                    #tracker_spec = OPENCV_OBJECT_TRACKERS[cv2.TrackerCSRT_create]()
-                    tracker.add(cv2.legacy.TrackerKCF_create(), frame, bbox)
+            
+            if size_curr != self.size_last_frame:
+                #print(bbox)
+                # --------------------------------------------
+                #Initalize the tracker for each person founded
+                # --------------------------------------------
+                #trackers.init (frame,bbox) 
+                #tracker_spec = OPENCV_OBJECT_TRACKERS[cv2.TrackerCSRT_create]()
+                tracker.add(cv2.legacy.TrackerKCF_create(), frame, bbox)
 
-                    #print("pessoas = " + str(size))
-                    #print("tracker id = " + str(self.tracker_id))
-                    self.tracker_id += 1
+                #print("pessoas = " + str(size))
+                #print("tracker id = " + str(self.tracker_id))
+                self.tracker_id += 1
                     
                 
             
@@ -156,14 +164,18 @@ class FaceRecognition:
             
             track_update(frame, self.tracker_id)
             
-                        
+            self.counted_frames += 1
+            cv2.putText(frame, str(self.counted_frames), (20, 20), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 3)            
+            
             # Display the resulting image
             cv2.imshow('Face Recognition', frame)
-
+            
+                    
+            self.size_last_frame = copy.copy(size_curr)
             # Hit 'q' on the keyboard to quit!
-            if cv2.waitKey(1) == ord('q'):
+            if cv2.waitKey(50) == ord('q'):
                 break
-
+        
         # Release handle to the webcam
         video_capture.release()
         cv2.destroyAllWindows()
