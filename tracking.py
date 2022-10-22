@@ -11,8 +11,8 @@ from colorama import Fore, Style, Back
 
 class Tracker():
 
-    def __init__(self, detection, id, image, tracker):
-        self.detection = detection
+    def __init__(self, id, image, tracker):
+        
         self.id = id
         self.tracker = tracker
         

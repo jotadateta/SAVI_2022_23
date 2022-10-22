@@ -20,16 +20,16 @@ def face_confidence(face_distance, face_match_threshold=0.6):
         return str(round(value, 2)) + '%'
 
 
-def track_update(img):
+def track_update(img, tracker_id):
         sucess, bbox = tracker.update(img)
         #print("estado = " + str(sucess) + " bbo = " + str(bbox))
         if sucess:
-            drawBox(img, bbox)
+            drawBox(img, bbox, tracker_id)
 
-def drawBox(img, bbox):
+def drawBox(img, bbox, tracker_id):
     x,y,w,h = int(bbox[0]),int(bbox[1]),int(bbox[2]),int(bbox[3])
     cv2.rectangle(img,(x,y),((x+w),(y+h)),(255,140,0),3)
-    cv2.putText(img, "pessoa", (x + 6, y - 6), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1)
+    cv2.putText(img, str(tracker_id), (x + 6, y - 6), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1)
                 
 
 
@@ -41,8 +41,10 @@ class FaceRecognition:
     known_face_names = []
     process_current_frame = True
     detections = []
-    tracker_counter = 0
+    tracker_id = 0
+    counted_id = 0
     trackers = []
+    bbox_prev = []
     
     
     def __init__(self):
@@ -59,29 +61,43 @@ class FaceRecognition:
 
     def run_recognition(self):
         video_capture = cv2.VideoCapture(0)
-
+        
+        
+        
+        
+        
+        
+        
         if not video_capture.isOpened():
             sys.exit('Video source not found...')
 
         while True:
             ret, frame = video_capture.read()
+            self.detections = []
 
             # Only process every other frame of video to save time
             if self.process_current_frame:
+                # ------------------------------------------
                 # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+                # ------------------------------------------
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                # --------------------------------------------
                 # Find all the faces and face encodings in the current frame of video
+                # --------------------------------------------
                 self.face_locations = face_recognition.face_locations(rgb_frame)
                 self.face_encodings = face_recognition.face_encodings(rgb_frame, self.face_locations)
 
                 self.face_names = []
                 for face_encoding in self.face_encodings:
+                    # ------------------------------------------------
                     # See if the face is a match for the known face(s)
+                    # ------------------------------------------------
                     matches = face_recognition.compare_faces(self.known_face_encodings, face_encoding)
                     name = "Unknown"
                     confidence = '???'
-
+                    # ----------------------------------------
                     # Calculate the shortest distance to face
+                    # ----------------------------------------
                     face_distances = face_recognition.face_distance(self.known_face_encodings, face_encoding)
 
                     best_match_index = np.argmin(face_distances)
@@ -92,10 +108,13 @@ class FaceRecognition:
                     self.face_names.append(f'{name} ({confidence})')
 
             self.process_current_frame = not self.process_current_frame
-
+            # ---------------------
             # Display the results
+            # ----------------------
             for (top, right, bottom, left), name in zip(self.face_locations, self.face_names):
+                # -------------------------------
                 # Create the frame with the name
+                # -------------------------------
                 cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
                 cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
                 cv2.putText(frame, name, (left + 6, bottom - 6), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1)
@@ -103,22 +122,31 @@ class FaceRecognition:
                 w = right-left
                 h = bottom-top
                 bbox = left,top,w,h
-
-                #self.detections.append(bbox)
+                # ----------------------------
+                # Create a list of detections
+                # ----------------------------
+                self.detections.append(bbox)
                 #print(self.detections)      
-                size = int(len(self.face_locations))
+                size = int(len(self.detections)) #number of persons
+                #print("counted id = " + str(self.counted_id))
+
                 
+            for detection in self.detections:
+                # --------------------------------------------
+                #Initalize the tracker for each person founded
+                # --------------------------------------------
                 tracker.init (frame,bbox) 
 
-                print("pessoas= " + str(size))
-                #Tracker(detection, id=self.tracker_counter, image=frame, tracker=self.tracker)
-
+                #print("pessoas = " + str(size))
+                #print("tracker id = " + str(self.tracker_id))
+                self.tracker_id += 1
+                
+                
             
-                self.tracker_counter += 1
-                #self.trackers.append(tracker_new)
-                
-                
-            track_update(frame,)
+            # ----------------------------
+            # Updte to tracker inside loop
+            # ----------------------------
+            track_update(frame, self.tracker_id)
             
                         
             # Display the resulting image
