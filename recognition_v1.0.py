@@ -5,7 +5,11 @@ import numpy as np
 import math
 from tracking import Tracker
 
-tracker = cv2.TrackerCSRT_create()
+#tracker = cv2.TrackerCSRT_create()
+#tracker_type = cv2.TrackerCSRT_create()
+
+#tracker = cv2.MultiTracker_create()
+tracker = cv2.legacy.MultiTracker_create()
 
 
 # Helper #make de %of confidence is the person based on photos
@@ -27,10 +31,13 @@ def track_update(img, tracker_id):
             drawBox(img, bbox, tracker_id)
 
 def drawBox(img, bbox, tracker_id):
-    x,y,w,h = int(bbox[0]),int(bbox[1]),int(bbox[2]),int(bbox[3])
-    cv2.rectangle(img,(x,y),((x+w),(y+h)),(255,140,0),3)
-    cv2.putText(img, str(tracker_id), (x + 6, y - 6), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1)
-                
+    print(bbox)
+    for (x, y, w, h)in bbox:
+        #x,y,w,h = int(bbox[0]),int(bbox[1]),int(bbox[2]),int(bbox[3])
+        
+        cv2.rectangle(img,(int(x),int(y)),((int(x)+int(w)),(int(y)+int(h))),(255,140,0),3)
+        #cv2.putText(img, str(tracker_id), (int(x) + 6, int(y) - 6), cv2.FONT_HERSHEY_DUPLEX, 0.8, (255, 255, 255), 1)
+            
 
 
 class FaceRecognition:
@@ -62,12 +69,9 @@ class FaceRecognition:
     def run_recognition(self):
         video_capture = cv2.VideoCapture(0)
         
-        
-        
-        
-        
-        
-        
+        # ---------------------------------
+        # detects if we have video sources
+        # ---------------------------------
         if not video_capture.isOpened():
             sys.exit('Video source not found...')
 
@@ -109,7 +113,7 @@ class FaceRecognition:
 
             self.process_current_frame = not self.process_current_frame
             # ---------------------
-            # Display the results
+            # Display the results (BBox)
             # ----------------------
             for (top, right, bottom, left), name in zip(self.face_locations, self.face_names):
                 # -------------------------------
@@ -129,23 +133,27 @@ class FaceRecognition:
                 #print(self.detections)      
                 size = int(len(self.detections)) #number of persons
                 #print("counted id = " + str(self.counted_id))
-
+                #print(bbox)
                 
-            for detection in self.detections:
-                # --------------------------------------------
-                #Initalize the tracker for each person founded
-                # --------------------------------------------
-                tracker.init (frame,bbox) 
+                if bbox != None:
+                    #print(bbox)
+                    # --------------------------------------------
+                    #Initalize the tracker for each person founded
+                    # --------------------------------------------
+                    #trackers.init (frame,bbox) 
+                    #tracker_spec = OPENCV_OBJECT_TRACKERS[cv2.TrackerCSRT_create]()
+                    tracker.add(cv2.legacy.TrackerKCF_create(), frame, bbox)
 
-                #print("pessoas = " + str(size))
-                #print("tracker id = " + str(self.tracker_id))
-                self.tracker_id += 1
-                
+                    #print("pessoas = " + str(size))
+                    #print("tracker id = " + str(self.tracker_id))
+                    self.tracker_id += 1
+                    
                 
             
             # ----------------------------
             # Updte to tracker inside loop
             # ----------------------------
+            
             track_update(frame, self.tracker_id)
             
                         
