@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+# -------------------------
+# Ficheiro fornecido pelo Professor Riem como apoio a realização do projeto
+# Todos os creditos são do mesmo
+# -------------------------
+
 import csv
 from copy import deepcopy
 from turtle import color

@@ -20,3 +20,7 @@ def database(person_file):
 
     # Este imshow pode dar asneira, mas o que precisa e que o ficheiro person_file de entrada seja a foto da pessoa que o programa reconhece
     cv2.imshow("Person Recognised", cv2.imread(person_file), cv2.IMREAD_GRAYSCALE)
+    
+if __name__ == '__main__':
+    database("/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces/jota_1.png")
+

@@ -5,10 +5,12 @@ import os, sys
 from functions import Detection, Tracker
 import face_recognition
 import math
+from database import database
 
 
-
+# ------------------------------------------------------------
 # Helper #make de %of confidence is the person based on photos
+# ------------------------------------------------------------
 def face_confidence(face_distance, face_match_threshold=0.6):
     range = (1.0 - face_match_threshold)
     linear_val = (1.0 - face_distance) / (range * 2.0)
@@ -24,14 +26,18 @@ def face_confidence(face_distance, face_match_threshold=0.6):
 
 
 def main():
-    # Definir haar cascade
-    face_cascade = cv2.CascadeClassifier('/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/dataset/haarcascade_frontalface_default.xml')
+    # ---------------------
+    # Define photos path
+    # ---------------------
+    
     path = "/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces"
-
 
 
     known_face_names = []
     known_face_encodings = []
+    # -----------------------------------------
+    # for loop to read all photos inside folder
+    # -----------------------------------------
     for image in os.listdir(path):
         face_image = face_recognition.load_image_file(f"/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces/{image}")
         face_encoding = face_recognition.face_encodings(face_image)[0]
@@ -60,7 +66,9 @@ def main():
     # Processing
     # -----------
     while True:
-        #Get the frame
+        # -------------
+        # Get the frame
+        # -------------
         _, frame_rgb = cap.read()
         frame_counter +=1
         
@@ -78,10 +86,6 @@ def main():
 
 
         stamp = float(cap.get(cv2.CAP_PROP_POS_MSEC))/1000
-        # ------------------------------------------
-        # Detection of persons 
-        # ------------------------------------------
-        #bboxes = face_cascade.detectMultiScale(image_gray, scaleFactor=1.2, minNeighbors=10, minSize=(100,100))
         # ------------------------------------------
         # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
         # ------------------------------------------
@@ -113,7 +117,7 @@ def main():
 
                     face_names.append(f'{name} ({confidence})')
         # ------------------------------------------
-        # Create Detections per haar cascade bbox
+        # Create Detections bbox
         # ------------------------------------------
         detections = []
         for (top, right, bottom, left), name in zip(face_locations, face_names):
@@ -127,8 +131,6 @@ def main():
             detection_counter += 1
             detection.draw(image_gui, name)
             detections.append(detection)
-            
-            # cv2.imshow('detection ' + str(detection.id), detection.image  )
 
         # ------------------------------------------------------------------------------
         # For each detection, see if there is a tracker to which it should be associated
@@ -199,7 +201,9 @@ def main():
     cv2.destroyAllWindows()
             
 
-
+# -----------------------
+# run main function
+# -----------------------
 
 if __name__ == '__main__':
     main()
