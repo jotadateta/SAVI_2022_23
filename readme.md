@@ -22,4 +22,4 @@ Universidade de aveiro, Departamento de engenharia mecanica
 
 # How to
 ## install
-1. Install Face recognition [aqui] (https://www.geeksforgeeks.org/how-to-install-face-recognition-in-python-on-linux/).
+1. Install Face recognition [aqui](https://www.geeksforgeeks.org/how-to-install-face-recognition-in-python-on-linux/).
