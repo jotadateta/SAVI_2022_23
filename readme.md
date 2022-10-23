@@ -22,4 +22,16 @@ Universidade de aveiro, Departamento de engenharia mecanica
 
 # How to
 ## install
-1. Install Face recognition [aqui](https://www.geeksforgeeks.org/how-to-install-face-recognition-in-python-on-linux/).
+1. Instalar Face recognition [aqui](https://www.geeksforgeeks.org/how-to-install-face-recognition-in-python-on-linux/).
+
+## Metodo
+1. Todas as imagens "pre-registadas" encontram-se na pasta /faces.
+2. Com o face_recognition foi se ler todas estas imagens e respetivos nomes de ficheiro.
+3. Criou-se um programa para perceber a web-cam
+4. Realizou-se o processamneto de imagem
+5. Utilizou-se o face_recognition na imagem processada pela webcam
+6. Processou-se a informação dando match com o "dataset" em caso de existencia
+7. De seguida implementou-se um tracking para cada pessoa detectada
+
+
+##### Todo o codigo encontra-se comentado de forma a facilitar a sua compreensão
