@@ -27,11 +27,11 @@ def face_confidence(face_distance, face_match_threshold=0.6):
         return str(round(value, 2)) + '%'
 
 
-def speak(audio):
-    if audio:
-        engine = pyttsx3.init()
-        engine.say("Hello")
-        engine.runAndWait()
+# def speak(audio):
+#     if audio:
+#         engine = pyttsx3.init()
+#         engine.say("Hello")
+#         engine.runAndWait()
 
 
 def main():
@@ -105,7 +105,7 @@ def main():
         face_locations = face_recognition.face_locations(rgb_frame)
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
         
-        audio = False
+        unknown_person = False
         face_names = []
         for face_encoding_processed in face_encodings:
                     # ------------------------------------------------
@@ -122,14 +122,15 @@ def main():
                     best_match_index = np.argmin(face_distances)
                     if matches[best_match_index]:
                         confidence = face_confidence(face_distances[best_match_index])
-                        if confidence > str(80):
+                        if confidence > str(50):
                             name = known_face_names[best_match_index]
-                            audio = not audio
+                            
                         else:
                             person = input("Quem estou a ver?")
                             name = str(person)
                             known_face_names.append(name)
                             known_face_encodings.append(face_encoding_processed)
+                            unknown_person = True
                             
                             
                     else:
@@ -139,6 +140,7 @@ def main():
                         
                         known_face_names.append(name)
                         known_face_encodings.append(face_encoding_processed)
+                        unknown_person = True
                     face_names.append(f'{name} ({confidence})')
         # ------------------------------------------
         # Create Detections bbox
@@ -156,12 +158,17 @@ def main():
             detection.draw(image_gui, name)
             detections.append(detection)
             
-            
-            # Cropping an image
-            cropped_image = image_gui[left:right, top:bottom]
+            if unknown_person:
+                
+                # Cropping an image
+                cropped_image = image_gui[top:bottom, left:right]
 
-            # Display cropped image
-            cv2.imshow("cropped", cropped_image)
+                # Display cropped image
+                cv2.imshow("cropped", cropped_image)
+                
+                # Save cropped image
+                cv2.imwrite("/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces/" + name + ".png", cropped_image)
+                
 
         # ------------------------------------------------------------------------------
         # For each detection, see if there is a tracker to which it should be associated
