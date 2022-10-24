@@ -92,3 +92,6 @@ def detection_faces():
 
 if __name__ == "__main__":
     detection_faces()
+    
+    
+    

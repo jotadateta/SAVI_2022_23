@@ -6,6 +6,7 @@ from functions import Detection, Tracker
 import face_recognition
 import math
 from database import database
+import pyscreenshot
 
 
 # ------------------------------------------------------------
@@ -112,9 +113,25 @@ def main():
 
                     best_match_index = np.argmin(face_distances)
                     if matches[best_match_index]:
-                        name = known_face_names[best_match_index]
                         confidence = face_confidence(face_distances[best_match_index])
-
+                        if confidence > str(80):
+                            name = known_face_names[best_match_index]
+                        else:
+                            person = input("Quem estou a ver?")
+                            name = str(person)
+                            known_face_names.append(name)
+                            known_face_encodings.append(face_encoding_processed)
+                            
+                            
+                    else:
+                        person = input("Quem estou a ver?")
+                        name = str(person)
+                        print(name)
+                        pic = pyscreenshot.grab(bbox=(x1,y1, w, h))
+                        pic.show()
+                        pic.save("/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces/" + person + ".png")
+                        known_face_names.append(name)
+                        known_face_encodings.append(face_encoding_processed)
                     face_names.append(f'{name} ({confidence})')
         # ------------------------------------------
         # Create Detections bbox
@@ -131,6 +148,7 @@ def main():
             detection_counter += 1
             detection.draw(image_gui, name)
             detections.append(detection)
+            
 
         # ------------------------------------------------------------------------------
         # For each detection, see if there is a tracker to which it should be associated
