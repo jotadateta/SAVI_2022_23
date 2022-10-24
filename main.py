@@ -28,23 +28,22 @@ def database(persons_files):
     counter = 1
     faces_database = []
     files = glob.glob("faces/*.png")
-    for file in files:
-        print(file)
+    for file in files:        
         image = cv2.imread(file)
         faces_database.append(image)
 
-    print('Faces DataBase shape:', np.array(faces_database).shape)
     plot_lines = int(len(faces_database)//3+1)
     for i in range(len(faces_database)):
         plt.subplot(plot_lines,3,i+1),plt.imshow(cv2.cvtColor(faces_database[i], cv2.COLOR_BGR2RGB)) #faces_database[i],'gray',vmin=0,vmax=255)
         plt.xticks([]),plt.yticks([])
-    plt.show()
+    plt.draw()
+    plt.pause(0.0001)
 
     # Este imshow pode dar asneira, mas o que precisa e que o ficheiro person_file de entrada seja a foto da pessoa que o programa reconhece
-    for person_file in persons_files:
-        window_name = str("Person Recognised ",counter)
-        cv2.imshow(window_name, cv2.imread("faces/{person_file}"), cv2.IMREAD_GRAYSCALE)
-        counter+=1
+    #for person_file in persons_files:
+    #    window_name = "Person Recognised "+str(counter)
+    #    cv2.imshow(window_name, cv2.imread("faces/{person_file}"), cv2.IMREAD_GRAYSCALE)
+    #    counter+=1
 
 
 
@@ -55,7 +54,7 @@ def main():
     # Define photos path
     # ---------------------
     
-    path = "/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces"
+    path = "C:\\Users\\Luis Pires\\Documents\\SAVI\\SAVI_Trabalho1\\SAVI_2022_23\\faces"
 
 
     known_face_names = []
@@ -144,8 +143,9 @@ def main():
                         confidence = face_confidence(face_distances[best_match_index])
 
                     if name == "Unknown":
-                        person_name = string(input("Person not recognised, please insert name to save in database: "))
-                        person_name = person_name.replace("\W","")
+                        person_name = str(input("Person not recognised, please insert name to save in database: "))
+                        person_name = person_name.replace("\W","_")
+                        print(person_name)
                         known_face_names.append(person_name)
                         known_face_encodings.append(face_encoding_processed)
 
@@ -161,6 +161,8 @@ def main():
             x1 = left
             y1 = top
             
+
+
             detection = Detection(x1, y1, w, h, image_gray, id=detection_counter, stamp=stamp, person_name = name)
             detection_counter += 1
             detection.draw(image_gui, name)
