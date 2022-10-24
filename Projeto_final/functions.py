@@ -63,7 +63,7 @@ class Detection(BoundingBox):
     def draw(self, image_gui, person_name,  color=(255,0,0)):
         cv2.rectangle(image_gui,(self.x1,self.y1),(self.x2, self.y2),color,3)
 
-        image = cv2.putText(image_gui, str(person_name) + "D" + str(self.id), (self.x1, self.y1-5), cv2.FONT_HERSHEY_SIMPLEX, 
+        image = cv2.putText(image_gui, str(person_name), (self.x1, self.y1-5), cv2.FONT_HERSHEY_SIMPLEX, 
                         1, color, 1, cv2.LINE_AA)
 
 
@@ -98,9 +98,9 @@ class Tracker():
         cv2.rectangle(image_gui,(last_detection.x1,last_detection.y1),
                       (last_detection.x2, last_detection.y2),color,3)
 
-        image = cv2.putText(image_gui, 'T' + str(self.id), 
-                            (last_detection.x2-40, last_detection.y1-5), cv2.FONT_HERSHEY_SIMPLEX, 
-                        1, color, 1, cv2.LINE_AA)
+        #image = cv2.putText(image_gui, 'T' + str(self.id), 
+        #                    (last_detection.x2-40, last_detection.y1-5), cv2.FONT_HERSHEY_SIMPLEX, 
+        #                1, color, 1, cv2.LINE_AA)
 
     def draw(self, image_gui, color=(255,0,255)):
 
@@ -111,13 +111,13 @@ class Tracker():
 
         cv2.rectangle(image_gui,(bbox.x1,bbox.y1),(bbox.x2, bbox.y2),color,3)
 
-        cv2.putText(image_gui, 'T' + str(self.id), 
-                            (bbox.x2-40, bbox.y1-5), cv2.FONT_HERSHEY_SIMPLEX, 
-                        1, color, 1, cv2.LINE_AA)
+        # cv2.putText(image_gui, 'T' + str(self.id), 
+        #                     (bbox.x2-40, bbox.y1-5), cv2.FONT_HERSHEY_SIMPLEX, 
+        #                 1, color, 1, cv2.LINE_AA)
 
-        cv2.putText(image_gui, str(self.time_since_last_detection) + ' s', 
-                            (bbox.x2-40, bbox.y1-25), cv2.FONT_HERSHEY_SIMPLEX, 
-                        1, color, 1, cv2.LINE_AA)
+        # cv2.putText(image_gui, str(self.time_since_last_detection) + ' s', 
+        #                     (bbox.x2-40, bbox.y1-25), cv2.FONT_HERSHEY_SIMPLEX, 
+        #                 1, color, 1, cv2.LINE_AA)
 
 
     def addDetection(self, detection, image):

@@ -3,14 +3,17 @@
 
 import cv2
 import numpy as np
-from copy import deepcopy
+from copy import copy, deepcopy
 import os, sys
+import os, shutil
 from functions import Detection, Tracker
 import face_recognition
 import math
-from database import database
+from database import database_show
 import tkinter as tk
 import pyttsx3
+import glob
+import matplotlib.pyplot as plt
 
 
 # ------------------------------------------------------------
@@ -26,24 +29,45 @@ def face_confidence(face_distance, face_match_threshold=0.6):
         value = (linear_val + ((1.0 - linear_val) * math.pow((linear_val - 0.5) * 2, 0.2))) * 100
         return str(round(value, 2)) + '%'
 
+# ---------------------
+# clean database folder
+# ---------------------
+def cleanfolder():
+    folder = '/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces'
+    for filename in os.listdir(folder):
+        file_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-# def speak(audio):
-#     if audio:
-#         engine = pyttsx3.init()
-#         engine.say("Hello")
-#         engine.runAndWait()
+
+
 
 
 def main():
+    # -----------
+    # clean database folder
+    # -----------
+    #cleanfolder()
+    
+    
+    
     # ---------------------
     # Define photos path
     # ---------------------
     
     path = "/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces"
-
-
+    
     known_face_names = []
     known_face_encodings = []
+    
+    
+
+    
     # -----------------------------------------
     # for loop to read all photos inside folder
     # -----------------------------------------
@@ -52,9 +76,8 @@ def main():
         face_encoding = face_recognition.face_encodings(face_image)[0]
         known_face_names.append(image)
         known_face_encodings.append(face_encoding)
-
-    
-    
+        
+        
     # ----------
     # variables
     # ----------
@@ -64,6 +87,7 @@ def main():
     iou_threshold = 0.8
     frame_counter = 0
     face_names = []
+    Person_previous_frame = []
     
     
     # -------------
@@ -75,6 +99,21 @@ def main():
     # Processing
     # -----------
     while True:
+        
+        
+        Person_current_frame = []
+        
+        
+        # ----------
+        # Database
+        # ---------
+        # for img in os.listdir(path):
+        #     img_arr=cv2.imread(os.path.join(path,img))
+        #     plt.figure
+        #     plt.imshow(img_arr)
+        
+            
+        
         # -------------
         # Get the frame
         # -------------
@@ -124,6 +163,7 @@ def main():
                         confidence = face_confidence(face_distances[best_match_index])
                         if confidence > str(50):
                             name = known_face_names[best_match_index]
+                            Person_current_frame.append(name)
                             
                         else:
                             person = input("Quem estou a ver?")
@@ -169,7 +209,11 @@ def main():
                 # Save cropped image
                 cv2.imwrite("/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces/" + name + ".png", cropped_image)
                 
-
+        if len(Person_previous_frame) < len(Person_current_frame):
+            engine = pyttsx3.init()
+            engine.say("Hello")
+            engine.runAndWait()
+            
         # ------------------------------------------------------------------------------
         # For each detection, see if there is a tracker to which it should be associated
         # ------------------------------------------------------------------------------
@@ -187,7 +231,7 @@ def main():
         # ------------------------------------------
         for tracker in trackers: # cycle all trackers
             last_detection_id = tracker.detections[-1].id
-            print(last_detection_id)
+            #print(last_detection_id)
             detection_ids = [d.id for d in detections]
             if not last_detection_id in detection_ids:
                 print('Tracker ' + str(tracker.id) + ' Doing some tracking')
@@ -223,6 +267,8 @@ def main():
 
         # for tracker in trackers:
             # print(tracker)
+            
+        Person_previous_frame = deepcopy(Person_current_frame)
 
         cv2.imshow('window_name',image_gui) # show the image
 
@@ -244,7 +290,8 @@ def main():
 # -----------------------
 
 if __name__ == '__main__':
-    main()
+  main()
+    
 
 
 
