@@ -1,3 +1,4 @@
+from ssl import OPENSSL_VERSION
 import string
 import cv2
 import numpy as np
@@ -24,26 +25,26 @@ def face_confidence(face_distance, face_match_threshold=0.6):
         return str(round(value, 2)) + '%'
 
 
-def database(persons_files):
+def database(all_persons_files,persons_in_frame):
     counter = 1
-    faces_database = []
-    files = glob.glob("faces/*.png")
-    for file in files:        
-        image = cv2.imread(file)
-        faces_database.append(image)
+    #faces_database = []
+    #files = glob.glob("faces/*.png")
+    #for file in files:        
+    #    image = cv2.imread(file)
+    #    faces_database.append(image)
 
-    plot_lines = int(len(faces_database)//3+1)
-    for i in range(len(faces_database)):
-        plt.subplot(plot_lines,3,i+1),plt.imshow(cv2.cvtColor(faces_database[i], cv2.COLOR_BGR2RGB)) #faces_database[i],'gray',vmin=0,vmax=255)
+    plot_lines = int((len(all_persons_files)-1)//3+1)
+    for i in range(len(all_persons_files)):
+        plt.subplot(plot_lines,3,i+1),plt.imshow(cv2.cvtColor(all_persons_files[i], cv2.COLOR_BGR2RGB)) #faces_database[i],'gray',vmin=0,vmax=255)
         plt.xticks([]),plt.yticks([])
     plt.draw()
     plt.pause(0.0001)
 
     # Este imshow pode dar asneira, mas o que precisa e que o ficheiro person_file de entrada seja a foto da pessoa que o programa reconhece
-    #for person_file in persons_files:
-    #    window_name = "Person Recognised "+str(counter)
-    #    cv2.imshow(window_name, cv2.imread("faces/{person_file}"), cv2.IMREAD_GRAYSCALE)
-    #    counter+=1
+    for person_in_frame in persons_in_frame:
+        window_name = "Person Recognised "+str(counter)
+        cv2.imshow(window_name, person_in_frame)
+        counter+=1
 
 
 
@@ -59,6 +60,7 @@ def main():
 
     known_face_names = []
     known_face_encodings = []
+    faces_known = []
     # -----------------------------------------
     # for loop to read all photos inside folder
     # -----------------------------------------
@@ -67,6 +69,7 @@ def main():
         face_encoding = face_recognition.face_encodings(face_image)[0]
         known_face_names.append(image)
         known_face_encodings.append(face_encoding)
+        faces_known.append(face_image)
 
     
     
@@ -139,7 +142,7 @@ def main():
                     best_match_index = np.argmin(face_distances)
                     if matches[best_match_index]:
                         name = known_face_names[best_match_index]
-                        persons_files.append(known_face_names[best_match_index])
+                        persons_files.append(faces_known[best_match_index])
                         confidence = face_confidence(face_distances[best_match_index])
 
                     if name == "Unknown":
@@ -148,6 +151,7 @@ def main():
                         print(person_name)
                         known_face_names.append(person_name)
                         known_face_encodings.append(face_encoding_processed)
+                        faces_known.append(frame)
 
                     face_names.append(f'{name} ({confidence})')
         # ------------------------------------------
@@ -223,7 +227,7 @@ def main():
             # print(tracker)
 
         cv2.imshow('window_name',image_gui) # show the image
-        database(persons_files)
+        database(faces_known,persons_files)
         
 
         if cv2.waitKey(50) == ord('q'):
