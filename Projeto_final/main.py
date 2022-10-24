@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+
 import cv2
 import numpy as np
 from copy import deepcopy
@@ -6,7 +9,8 @@ from functions import Detection, Tracker
 import face_recognition
 import math
 from database import database
-import pyscreenshot
+import tkinter as tk
+import pyttsx3
 
 
 # ------------------------------------------------------------
@@ -23,7 +27,11 @@ def face_confidence(face_distance, face_match_threshold=0.6):
         return str(round(value, 2)) + '%'
 
 
-
+def speak(audio):
+    if audio:
+        engine = pyttsx3.init()
+        engine.say("Hello")
+        engine.runAndWait()
 
 
 def main():
@@ -97,7 +105,7 @@ def main():
         face_locations = face_recognition.face_locations(rgb_frame)
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
         
-        
+        audio = False
         face_names = []
         for face_encoding_processed in face_encodings:
                     # ------------------------------------------------
@@ -116,6 +124,7 @@ def main():
                         confidence = face_confidence(face_distances[best_match_index])
                         if confidence > str(80):
                             name = known_face_names[best_match_index]
+                            audio = not audio
                         else:
                             person = input("Quem estou a ver?")
                             name = str(person)
@@ -127,9 +136,7 @@ def main():
                         person = input("Quem estou a ver?")
                         name = str(person)
                         print(name)
-                        pic = pyscreenshot.grab(bbox=(x1,y1, w, h))
-                        pic.show()
-                        pic.save("/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces/" + person + ".png")
+                        
                         known_face_names.append(name)
                         known_face_encodings.append(face_encoding_processed)
                     face_names.append(f'{name} ({confidence})')
@@ -149,6 +156,12 @@ def main():
             detection.draw(image_gui, name)
             detections.append(detection)
             
+            
+            # Cropping an image
+            cropped_image = image_gui[left:right, top:bottom]
+
+            # Display cropped image
+            cv2.imshow("cropped", cropped_image)
 
         # ------------------------------------------------------------------------------
         # For each detection, see if there is a tracker to which it should be associated
