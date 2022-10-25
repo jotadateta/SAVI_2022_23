@@ -55,7 +55,7 @@ def main():
     # Define photos path
     # ---------------------
     
-    path = "C:\\Users\\Luis Pires\\Documents\\SAVI\\SAVI_Trabalho1\\SAVI_2022_23\\faces"
+    path = "/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces"
 
 
     known_face_names = []
