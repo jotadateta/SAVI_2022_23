@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 
+from typing import Counter
 import cv2
 import numpy as np
 from copy import copy, deepcopy
@@ -14,6 +15,27 @@ import tkinter as tk
 import pyttsx3
 import glob
 import matplotlib.pyplot as plt
+
+
+def database(person_file, persons_in_frame):
+    Counter = 1
+    print('Faces DataBase shape:', np.array(person_file).shape)
+    plot_lines = int(len(person_file)//3+1)
+    for i in range(len(person_file)):
+        plt.subplot(plot_lines,3,i+1),plt.imshow(cv2.cvtColor(person_file[i], cv2.COLOR_BGR2RGB)) #faces_database[i],'gray',vmin=0,vmax=255)
+        plt.xticks([]),plt.yticks([])
+    plt.draw(); plt.pause(0.01)
+
+    for person_in_frame in persons_in_frame:
+        window_name = "person recognized" + str(Counter)
+        cv2.imshow(window_name,person_in_frame)
+        Counter += 1
+    # Este imshow pode dar asneira, mas o que precisa e que o ficheiro person_file de entrada seja a foto da pessoa que o programa reconhece
+    #cv2.imshow("Person Recognised", cv2.imread(person_file), cv2.IMREAD_GRAYSCALE)
+    
+# if __name__ == '__main__':
+#     database("/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces/jota_1.png")
+
 
 
 # ------------------------------------------------------------
@@ -67,7 +89,7 @@ def main():
     
     
 
-    
+    faces_known = []
     # -----------------------------------------
     # for loop to read all photos inside folder
     # -----------------------------------------
@@ -76,7 +98,7 @@ def main():
         face_encoding = face_recognition.face_encodings(face_image)[0]
         known_face_names.append(image)
         known_face_encodings.append(face_encoding)
-        
+        faces_known.append(face_image)
         
     # ----------
     # variables
@@ -102,7 +124,7 @@ def main():
         
         
         Person_current_frame = []
-        
+        Person_files = []
         
         # ----------
         # Database
@@ -164,6 +186,7 @@ def main():
                         if confidence > str(50):
                             name = known_face_names[best_match_index]
                             Person_current_frame.append(name)
+                            #Person_files.append(faces_known[best_match_index])
                             
                         else:
                             person = input("Quem estou a ver?")
@@ -208,6 +231,8 @@ def main():
                 
                 # Save cropped image
                 cv2.imwrite("/home/jota/Documents/SAVI/savi_22-23/SAVI_Trabalho1/faces/" + name + ".png", cropped_image)
+                
+                #faces_known.append[cropped_image]
                 
         if len(Person_previous_frame) < len(Person_current_frame):
             engine = pyttsx3.init()
@@ -271,7 +296,9 @@ def main():
         Person_previous_frame = deepcopy(Person_current_frame)
 
         cv2.imshow('window_name',image_gui) # show the image
-
+        database(faces_known,Person_files)
+        
+        
         if cv2.waitKey(50) == ord('q'):
             break
 
